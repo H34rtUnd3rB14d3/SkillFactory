@@ -1,13 +1,29 @@
-def check(ch_row, ch_col):
-    symbol = field[ch_row][ch_col]
+def check_win(row, col):
+    symbol = field[row][col]
     win_con_row = 0
     win_con_col = 0
+    win_con_diag = 0
+
+    if row == col:
+        for i in range(1, ROW + 1):
+            if field[i][i] == symbol:
+                win_con_diag += 1
+        if win_con_diag == 3:
+            return True
+        win_con_diag = 0
+    if ROW == row + col - 1:
+        for i in range(1, ROW + 1):
+            if field[i][ROW + 1 - i] == symbol:
+                win_con_diag += 1
+        if win_con_diag == 3:
+            return True
+
     for i in range(1, ROW + 1):
-        if field[i][ch_col] == symbol:
+        if field[i][col] == symbol:
             win_con_row += 1
 
     for i in range(1, COL + 1):
-        if field[ch_row][i] == symbol:
+        if field[row][i] == symbol:
             win_con_col += 1
 
     if win_con_col == 3 or win_con_row == 3:
@@ -68,7 +84,7 @@ while move_counter != 10:
             print("The first move should be at the center of a field")
             x, y = move()
     field[x][y] = symbol
-    if check(x, y):
+    if check_win(x, y):
         if symbol == "X":
             flag = "X"
         else:
