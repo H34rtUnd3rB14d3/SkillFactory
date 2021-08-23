@@ -1,35 +1,12 @@
 def check_win(row: int, col: int) -> bool:  # function that check either 1p or 2p wins
     sym = field[row][col]  # define whose turn
-    win_con_row = 0
-    win_con_col = 0  # if there is 3 same symbols in one row or column or diagonals
-    win_con_diag = 0
-
-    if row == col:  # first diagonal check
-        for i in range(1, ROW + 1):
-            if field[i][i] == sym:
-                win_con_diag += 1
-        if win_con_diag == 3:
+    for comb in win_comb:
+        temp = ""
+        for cell in comb:
+            temp += field[cell[0]][cell[1]]
+        if temp == sym * 3:
             return True
-        win_con_diag = 0
-    if ROW == row + col - 1:  # second diagonal check
-        for i in range(1, ROW + 1):
-            if field[i][ROW + 1 - i] == sym:
-                win_con_diag += 1
-        if win_con_diag == 3:
-            return True
-
-    for i in range(1, ROW + 1):  # column check
-        if field[i][col] == sym:
-            win_con_row += 1
-
-    for i in range(1, COL + 1):  # row check
-        if field[row][i] == sym:
-            win_con_col += 1
-
-    if win_con_col == 3 or win_con_row == 3:
-        return True
-    else:
-        return False
+    return False
 
 
 def validate(data: list) -> str:  # function that validate user input and return message that describe errors
@@ -70,6 +47,18 @@ ROW = COL = 3  # constants that define size of the field
 field = [[" " for _ in range(COL)] for _ in range(ROW)]  # fill not only playable part but also some decor
 field.insert(0, list(map(str, range(-1, COL))))
 field[0][0] = " "
+
+win_comb = set() # set of all possible win combinations
+for i in range(1, ROW + 1):
+    for j in range(1, COL + 1):
+        win_comb.add(tuple((i, g) for g in range(1, COL + 1)))
+        win_comb.add(tuple((g, j) for g in range(1, ROW + 1)))
+win_comb = list(win_comb)
+diag1 = tuple((i, i) for i in range(1, ROW + 1))
+diag2 = tuple((i, ROW - i + 1) for i in range(1, COL + 1))
+win_comb.append(diag1)
+win_comb.append(diag2)
+
 for i in range(ROW):
     field[i + 1].insert(0, str(i))
 
@@ -77,7 +66,7 @@ move_counter = 1  # define move number
 flag = " "  # flag that define who is winner
 show()
 while move_counter != ROW * COL + 1:  # we have only row*col free space and if nobody wins that draw
-    symbol = "X" if move_counter % 2 else "O" # define whose turn
+    symbol = "X" if move_counter % 2 else "O"  # define whose turn
     x, y = move()
     if move_counter == 1:
         while x != ROW // 2 + 1 and y != COL // 2 + 1:
@@ -92,10 +81,11 @@ while move_counter != ROW * COL + 1:  # we have only row*col free space and if n
         break
     move_counter += 1
     show()
-
 if flag == "X":
+    show()
     print("1p wins")
 elif flag == "O":
+    show()
     print("2p wins")
 else:
     print("draw")
